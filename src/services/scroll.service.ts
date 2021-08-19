@@ -8,9 +8,16 @@ export class ScrollService {
     protected startScrollTop: number = 0;
 
     protected endScrollTop: number = 1;
+    
+    protected offsetTop: number = 0;
 
-    public scrollToId (elementId: string): void {
+    public scrollToId (elementId: string, offsetTop?: number = 0): void {
         const element: Element | null = document.querySelector(`#${elementId}`);
+        
+        if (offsetTop && typeof offsetTop === "number") {
+            this.offsetTop = offsetTop;
+        }
+        
         if (element instanceof HTMLElement) {
             this.scrollToElement(element);
         }
@@ -26,7 +33,7 @@ export class ScrollService {
         let {scrollTop} = document.documentElement;
         scrollTop = scrollTop === 0 ? document.body.scrollTop : scrollTop;
         this.startScrollTop = scrollTop;
-        this.endScrollTop = this.startScrollTop - navBarHeight + elemRect.top;
+        this.endScrollTop = this.startScrollTop - navBarHeight + elemRect.top + this.offsetTop;
 
         this.animateScroll(element, navBarHeight);
     }
@@ -37,7 +44,7 @@ export class ScrollService {
         const elemRect: ClientRect = element.getBoundingClientRect();
         let {scrollTop} = document.documentElement;
         scrollTop = scrollTop === 0 ? document.body.scrollTop : scrollTop;
-        this.endScrollTop = scrollTop - navBarHeight + elemRect.top;
+        this.endScrollTop = scrollTop - navBarHeight + elemRect.top + this.offsetTop;
 
         // Bezier animation
         let time: number = (performance.now() - this.startTime) / this.scrollTime;
